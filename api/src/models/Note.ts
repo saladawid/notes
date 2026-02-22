@@ -4,7 +4,7 @@ import { INote } from '../types';
 const historySchema = new Schema(
   {
     title: { type: String, required: true },
-    content: { type: String, required: true },
+    content: { type: String, default: '' },
     savedAt: { type: Date, default: Date.now },
   },
   { _id: false }
