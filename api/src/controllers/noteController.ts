@@ -12,7 +12,9 @@ export const getNotes = async (req: AuthRequest, res: Response): Promise<void> =
   const filter: Record<string, unknown> = { owner };
 
   if (typeof search === 'string' && search.trim()) {
-    filter.$text = { $search: search };
+    const escaped = search.trim().replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+    const regex = new RegExp(escaped, 'i');
+    filter.$or = [{ title: regex }, { content: regex }];
   }
 
   if (typeof tags === 'string' && tags) {
