@@ -70,6 +70,42 @@
 
 .check {
   font-size: 0.75rem;
+  width: 0.875rem;
+  flex-shrink: 0;
+}
+
+.tagName {
+  flex: 1;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.deleteTagBtn {
+  flex-shrink: 0;
+  background: none;
+  border: none;
+  color: var(--color-text-muted);
+  cursor: pointer;
+  padding: 0 var(--space-1);
+  font-size: 1rem;
+  line-height: 1;
+  border-radius: var(--radius-sm);
+  opacity: 0;
+  transition: opacity var(--transition-fast), color var(--transition-fast);
+}
+
+.listItem:hover .deleteTagBtn {
+  opacity: 1;
+}
+
+.deleteTagBtn:hover {
+  color: var(--color-danger);
+}
+
+.deleteTagBtn:disabled {
+  cursor: not-allowed;
+  opacity: 0.5;
 }
 
 .empty {

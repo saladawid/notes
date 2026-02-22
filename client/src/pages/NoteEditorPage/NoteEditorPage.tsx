@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Link, useNavigate, useParams } from 'react-router-dom';
 import styles from './NoteEditorPage.module.css';
 import { useNote } from '../../hooks/useNote';
@@ -29,7 +29,13 @@ export function NoteEditorPage() {
     loadHistory,
   } = useNote(id);
 
-  const { tags: allTags, createTag } = useTags();
+  const { tags: allTags, createTag, deleteTag } = useTags();
+
+  // Local tag selection state — keeps in sync after changes without refetching note
+  const [selectedTagIds, setSelectedTagIds] = useState<string[]>([]);
+  useEffect(() => {
+    if (note) setSelectedTagIds(note.tags.map(t => t._id));
+  }, [note?._id]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const [newTitle, setNewTitle] = useState('');
   const [newContent, setNewContent] = useState('');
@@ -53,7 +59,18 @@ export function NoteEditorPage() {
 
   const handleTagChange = async (ids: string[]) => {
     if (!id || !note) return;
+    setSelectedTagIds(ids);
     await notesService.updateNote(id, { tags: ids });
+  };
+
+  const handleDeleteTag = async (tagId: string) => {
+    await deleteTag(tagId);
+    // Also remove from note if it was assigned
+    const nextIds = selectedTagIds.filter(x => x !== tagId);
+    if (id && note && nextIds.length !== selectedTagIds.length) {
+      setSelectedTagIds(nextIds);
+      await notesService.updateNote(id, { tags: nextIds });
+    }
   };
 
   const handleHistoryToggle = async () => {
@@ -167,9 +184,10 @@ export function NoteEditorPage() {
             <span className={styles.sidebarLabel}>Tags</span>
             <TagSelector
               allTags={allTags}
-              selectedIds={note?.tags.map(t => t._id) ?? []}
+              selectedIds={selectedTagIds}
               onChange={handleTagChange}
               onCreateTag={createTag}
+              onDeleteTag={handleDeleteTag}
             />
           </div>
 

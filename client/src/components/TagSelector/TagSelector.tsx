@@ -9,12 +9,14 @@ interface TagSelectorProps {
   selectedIds: string[];
   onChange: (ids: string[]) => void;
   onCreateTag?: (name: string) => Promise<Tag | null>;
+  onDeleteTag?: (id: string) => Promise<void>;
 }
 
-export function TagSelector({ allTags, selectedIds, onChange, onCreateTag }: TagSelectorProps) {
+export function TagSelector({ allTags, selectedIds, onChange, onCreateTag, onDeleteTag }: TagSelectorProps) {
   const [open, setOpen] = useState(false);
   const [newTagName, setNewTagName] = useState('');
   const [creating, setCreating] = useState(false);
+  const [deletingId, setDeletingId] = useState<string | null>(null);
   const wrapperRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -28,7 +30,6 @@ export function TagSelector({ allTags, selectedIds, onChange, onCreateTag }: Tag
   }, []);
 
   const selectedTags = allTags.filter(t => selectedIds.includes(t._id));
-  const availableTags = allTags.filter(t => !selectedIds.includes(t._id));
 
   const toggle = (id: string) => {
     if (selectedIds.includes(id)) {
@@ -36,6 +37,14 @@ export function TagSelector({ allTags, selectedIds, onChange, onCreateTag }: Tag
     } else {
       onChange([...selectedIds, id]);
     }
+  };
+
+  const handleDelete = async (e: React.MouseEvent, id: string) => {
+    e.stopPropagation();
+    if (!onDeleteTag) return;
+    setDeletingId(id);
+    await onDeleteTag(id);
+    setDeletingId(null);
   };
 
   const handleCreate = async () => {
@@ -94,11 +103,22 @@ export function TagSelector({ allTags, selectedIds, onChange, onCreateTag }: Tag
                   onClick={() => toggle(tag._id)}
                 >
                   <span className={styles.check}>{selectedIds.includes(tag._id) ? '✓' : ''}</span>
-                  {tag.name}
+                  <span className={styles.tagName}>{tag.name}</span>
+                  {onDeleteTag && (
+                    <button
+                      className={styles.deleteTagBtn}
+                      onClick={e => handleDelete(e, tag._id)}
+                      disabled={deletingId === tag._id}
+                      aria-label={`Delete tag ${tag.name}`}
+                      type="button"
+                    >
+                      {deletingId === tag._id ? '…' : '×'}
+                    </button>
+                  )}
                 </div>
               ))}
-            {availableTags.length === 0 && !newTagName && (
-              <div className={styles.empty}>No more tags available</div>
+            {allTags.length === 0 && (
+              <div className={styles.empty}>No tags yet — create one above</div>
             )}
           </div>
         )}
