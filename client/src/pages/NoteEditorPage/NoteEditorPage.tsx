@@ -32,6 +32,7 @@ export function NoteEditorPage() {
   const { tags: allTags, createTag } = useTags();
 
   const [newTitle, setNewTitle] = useState('');
+  const [newContent, setNewContent] = useState('');
   const [isCreating, setIsCreating] = useState(false);
   const [createError, setCreateError] = useState('');
   const [showHistory, setShowHistory] = useState(false);
@@ -42,7 +43,7 @@ export function NoteEditorPage() {
     setIsCreating(true);
     setCreateError('');
     try {
-      const note = await notesService.createNote(newTitle.trim());
+      const note = await notesService.createNote(newTitle.trim(), newContent);
       navigate(`/notes/${note._id}`, { replace: true });
     } catch (err) {
       setCreateError(err instanceof Error ? err.message : 'Failed to create note');
@@ -69,20 +70,45 @@ export function NoteEditorPage() {
           <Link to="/notes" className={styles.backLink}>← Back</Link>
           <span className={styles.headerTitle}>New Note</span>
         </header>
-        <main style={{ padding: '2rem', maxWidth: '32rem', margin: '0 auto' }}>
-          {createError && <div className={styles.errorAlert}>{createError}</div>}
-          <form onSubmit={handleCreate} style={{ display: 'flex', gap: '0.75rem' }}>
+
+        <div className={styles.newMain}>
+          <form className={styles.newCard} onSubmit={handleCreate}>
+            {createError && (
+              <div style={{ padding: 'var(--space-3) var(--space-6)' }}>
+                <div className={styles.errorAlert}>{createError}</div>
+              </div>
+            )}
+
             <input
-              className={styles.titleInput}
-              style={{ flex: 1, fontSize: '1rem', fontWeight: 500, padding: '0.5rem 0.75rem', borderRadius: '0.5rem', border: '1px solid var(--color-border)' }}
+              className={styles.newTitleInput}
               placeholder="Note title…"
               value={newTitle}
               onChange={e => setNewTitle(e.target.value)}
               autoFocus
+              required
             />
-            <Button type="submit" isLoading={isCreating}>Create</Button>
+
+            <textarea
+              className={styles.newContentArea}
+              placeholder="Start writing…"
+              value={newContent}
+              onChange={e => setNewContent(e.target.value)}
+              onKeyDown={e => {
+                if (e.key === 'Enter' && (e.ctrlKey || e.metaKey)) {
+                  e.preventDefault();
+                  e.currentTarget.form?.requestSubmit();
+                }
+              }}
+            />
+
+            <div className={styles.newFooter}>
+              <Link to="/notes" className={styles.backLink}>Cancel</Link>
+              <Button type="submit" isLoading={isCreating} disabled={!newTitle.trim()}>
+                Create Note
+              </Button>
+            </div>
           </form>
-        </main>
+        </div>
       </div>
     );
   }

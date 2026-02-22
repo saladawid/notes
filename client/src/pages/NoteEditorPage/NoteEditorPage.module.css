@@ -139,3 +139,78 @@
   color: var(--color-danger);
   font-size: var(--font-size-sm);
 }
+
+/* ── New note form ── */
+.newMain {
+  flex: 1;
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  padding: var(--space-8) var(--space-4);
+  background-color: var(--color-bg);
+}
+
+.newCard {
+  width: 100%;
+  max-width: 48rem;
+  background-color: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-md);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.newTitleInput {
+  width: 100%;
+  border: none;
+  border-bottom: 1px solid var(--color-border);
+  padding: var(--space-4) var(--space-6);
+  font-size: var(--font-size-xl);
+  font-weight: 700;
+  color: var(--color-text);
+  background-color: var(--color-surface);
+  font-family: inherit;
+  transition: border-bottom-color var(--transition-fast);
+}
+
+.newTitleInput::placeholder {
+  color: var(--color-text-placeholder);
+  font-weight: 400;
+}
+
+.newTitleInput:focus {
+  outline: none;
+  border-bottom-color: var(--color-primary);
+}
+
+.newContentArea {
+  border: none;
+  padding: var(--space-4) var(--space-6);
+  font-size: var(--font-size-base);
+  color: var(--color-text);
+  background-color: var(--color-surface);
+  resize: none;
+  line-height: 1.7;
+  font-family: inherit;
+  min-height: 16rem;
+}
+
+.newContentArea::placeholder {
+  color: var(--color-text-placeholder);
+}
+
+.newContentArea:focus {
+  outline: none;
+}
+
+.newFooter {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: var(--space-3);
+  padding: var(--space-3) var(--space-6);
+  border-top: 1px solid var(--color-border);
+  background-color: var(--color-bg);
+}
